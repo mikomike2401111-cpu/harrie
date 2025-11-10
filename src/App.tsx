@@ -12,11 +12,20 @@ import WhatsAppFloating from './components/WhatsAppFloating';
 function App() {
   const [currentCategory, setCurrentCategory] = useState<string>('all');
   const [showHero, setShowHero] = useState(true);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const handleCategoryChange = (category: string) => {
     setCurrentCategory(category);
     setShowHero(category === 'all');
+    setSearchQuery('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim() !== '') {
+      setShowHero(false);
+    }
   };
 
   return (
@@ -24,6 +33,7 @@ function App() {
       <Header
         onCategoryChange={handleCategoryChange}
         currentCategory={currentCategory}
+        onSearch={handleSearch}
       />
 
       {showHero && (
@@ -34,7 +44,7 @@ function App() {
         </>
       )}
 
-      <ProductGrid category={currentCategory} />
+      <ProductGrid category={currentCategory} searchQuery={searchQuery} />
 
       {showHero && (
         <>

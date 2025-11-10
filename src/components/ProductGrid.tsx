@@ -4,9 +4,10 @@ import ProductCard from './ProductCard';
 
 interface ProductGridProps {
   category: string;
+  searchQuery?: string;
 }
 
-export default function ProductGrid({ category }: ProductGridProps) {
+export default function ProductGrid({ category, searchQuery }: ProductGridProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
@@ -14,7 +15,7 @@ export default function ProductGrid({ category }: ProductGridProps) {
 
   useEffect(() => {
     fetchProducts();
-  }, [category]);
+  }, [category, searchQuery]);
 
   async function fetchProducts() {
     setLoading(true);
@@ -50,10 +51,21 @@ export default function ProductGrid({ category }: ProductGridProps) {
     }
   }
 
-  const filteredProducts =
-    selectedSubcategory === 'all'
-      ? products
-      : products.filter((p) => p.subcategory === selectedSubcategory);
+  let filteredProducts = products;
+
+  if (selectedSubcategory !== 'all') {
+    filteredProducts = filteredProducts.filter((p) => p.subcategory === selectedSubcategory);
+  }
+
+  if (searchQuery && searchQuery.trim() !== '') {
+    const query = searchQuery.toLowerCase();
+    filteredProducts = filteredProducts.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        (p.subcategory && p.subcategory.toLowerCase().includes(query)) ||
+        (p.description && p.description.toLowerCase().includes(query))
+    );
+  }
 
   if (loading) {
     return (
